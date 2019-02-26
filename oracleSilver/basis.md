@@ -42,3 +42,30 @@ import java.io.*;
 import static sample1.sampleValue;
 import static sample1.sampleMethod;
 ```
+
+### エントリポイントについて
+```
+public static void main(string[] args){
+  // some code
+}
+```
+ - publicであること
+ - staticであること
+ - 返り値はvoidであること
+ - メソッド名はmainであること
+ - 引数は可変長のstringであること
+
+### 数値型配列への×進数での代入に使用する接頭辞
+ - 2進数:0b
+ - 8進数:0
+ - 16進数:0x
+
+### 数値リテラルで使用するアンダースコアについて
+ - 記号の前後は使用不可（0b,0x,L,F,.など）
+ - アンダースコア連続はOK
+
+### char型について
+ - ''で囲われた文字のみが代入可能
+ - ""で囲ってあるものは、文字列なので１文字でも不可
+ - 数字では0~65535が代入できる
+ - \u0000のように４桁までの16進数でも表記できる
