@@ -1,4 +1,11 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import pretty_midi
+import sys
+
+args = sys.argv
+argsList = list(args[1])
 
 pm = pretty_midi.PrettyMIDI(resolution=960, initial_tempo=120)
 instrument = pretty_midi.Instrument(0)
@@ -8,7 +15,13 @@ def makeNote(note, startTime, endTime):
     note = pretty_midi.Note(velocity=100, pitch=note_number, start=startTime, end=endTime)
     return note
 
-list = [ 'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5']
+list = []
+
+for item in argsList :
+    noteName = item + '4'
+    print(noteName),
+    list.append(noteName)
+
 noteTime = 0
 for item in list:
     instrument.notes.append(makeNote(item, noteTime, noteTime+1))
