@@ -2,7 +2,6 @@ import cv2
 import glob
 import os
 import numpy as np
-import csv
 import pretty_midi
 
 def calcRGB(img_array):
@@ -11,47 +10,50 @@ def calcRGB(img_array):
     return average_color
 
 def makeNote(note, startTime, endTime):
-    note_number = pretty_midi.note_name_to_number(note)
-    note = pretty_midi.Note(velocity=100, pitch=note_number, start=startTime, end=endTime)
+    note = pretty_midi.Note(velocity=100, pitch=note, start=startTime, end=endTime)
     return note
+
+def makeChord(base):
+    majorCordList = [0, 2, 4, 5, 7, 9, 11]
+
+    chordList = []
+    for a in range(0,3):
+        listNum= base + a * 2
+        chordList.append(60 + majorCordList[listNum])
+
+    return chordList
 
 def main():
     files = glob.glob("./images/*")
 
-    f = open('./output/RGB.csv', 'w')
-    csvWriter = csv.writer(f)
-
     for fname in files:
+        # read image
         filename = os.path.basename(fname)
         bgr = cv2.imread(fname, -1)
         average_color = calcRGB(bgr)
-        listData = []
-        listData.append(filename)
-        for element in average_color :
-            listData.append(element)
-        print(listData)
 
-        csvWriter.writerow(listData)
-
+        # initial define about music
         pm = pretty_midi.PrettyMIDI(resolution=960, initial_tempo=120)
         instrument = pretty_midi.Instrument(0)
 
-        argsList = ["C", "D", "E", "F", "G", "A", "B"]
-
-        for item in argsList :
-
-            notelist = []
-            noteName = item + '4'
-            print(noteName),
-            notelist.append(noteName)
+        majorCordList = [0, 2, 4, 5, 7, 9, 11]
 
         noteTime = 0
-        for item in notelist:
-            instrument.notes.append(makeNote(item, noteTime, noteTime+1))
+        for a in range(0,5):
+            chordList = makeChord(np.random.randint(0,3))
+
+            instrument.notes.append(makeNote(chordList[0], noteTime, noteTime+1))
+            instrument.notes.append(makeNote(chordList[1], noteTime, noteTime+1))
+            instrument.notes.append(makeNote(chordList[2], noteTime, noteTime+1))
             pm.instruments.append(instrument)
             noteTime = noteTime +1
 
         pm.write('output/' + filename + '.mid')
+        # audio_data = pm.fluidsynth()
+        # music_max = np.max(np.abs(audio_data))
+        # muisc_array = (audio_data/music_max).astype(np.float32)
+        # wav_file_name = 'test.wav'
+        # wavfile.write(wav_file_name,44100, muisc_array)
 
 
 
