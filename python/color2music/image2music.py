@@ -9,19 +9,19 @@ def calcRGB(img_array):
     average_color = np.average(average_color_per_row, axis=0)
     return average_color
 
-def makeNote(note, startTime, endTime):
-    note = pretty_midi.Note(velocity=100, pitch=note, start=startTime, end=endTime)
+def makeNote(note, startTime, noteLong, velocity):
+    endTime =  startTime + noteLong
+    note = pretty_midi.Note(velocity=velocity, pitch=note, start=startTime, end=endTime)
     return note
 
-def makeChord(base):
-    majorCordList = [0, 2, 4, 5, 7, 9, 11]
+def makeAllChordList(chord):
+    allChordList = []
+    majorChordSubList = [0, 2, 4, 5, 7, 9, 11]
+    for octave in range(2,10) :
+        for sub in majorChordSubList :
+            allChordList.append(octave*12 + sub + chord)
 
-    chordList = []
-    for a in range(0,3):
-        listNum= base + a * 2
-        chordList.append(60 + majorCordList[listNum])
-
-    return chordList
+    return allChordList
 
 def main():
     files = glob.glob("./images/*")
@@ -36,26 +36,52 @@ def main():
         pm = pretty_midi.PrettyMIDI(resolution=960, initial_tempo=120)
         instrument = pretty_midi.Instrument(0)
 
-        majorCordList = [0, 2, 4, 5, 7, 9, 11]
+        noteList = makeAllChordList(0);
 
         noteTime = 0
-        for a in range(0,5):
-            chordList = makeChord(np.random.randint(0,3))
+        updownFlag = np.random.randint(0,2)
+        termLong = 4
+        noteLong = 1
+        noteNumber = 0
+        for a in range(0,12):
+            baseNote = np.random.randint(0,7)
+            instrument.notes.append(makeNote(noteList[7+baseNote], noteTime, termLong, 75))
+            instrument.notes.append(makeNote(noteList[7+baseNote+2], noteTime, termLong, 75))
+            instrument.notes.append(makeNote(noteList[7+baseNote+4], noteTime, termLong, 75))
 
-            instrument.notes.append(makeNote(chordList[0], noteTime, noteTime+1))
-            instrument.notes.append(makeNote(chordList[1], noteTime, noteTime+1))
-            instrument.notes.append(makeNote(chordList[2], noteTime, noteTime+1))
+            randomNumber = np.random.randint(0,5)*2 - 4
+            firstNoteNumber = 7*4 + baseNote + randomNumber
+
+            if noteNumber!=0:
+                while (noteNumber-firstNoteNumber) > 6:
+                    randomNumber = np.random.randint(0,10)*2 - 4
+                    firstNoteNumber = 7*4 + baseNote + randomNumber
+
+            instrument.notes.append(makeNote(noteList[firstNoteNumber], noteTime, noteLong, 100))
+
+            continusCount = 0
+            for a in range(1,4):
+                if noteNumber > 35 : noteNumber = noteNumber  - 10
+                elif noteNumber < 23 : noteNumber = noteNumber + 10
+
+                randomNumber = np.random.randint(0,4)*2
+                if continusCount<1 : continusCount = continusCount+1
+                else :
+                    randomNumber = np.random.randint(1,4)*2
+
+                if updownFlag==1 : randomNumber = randomNumber * -1
+                noteNumber = firstNoteNumber + randomNumber
+
+                # print("listsize:",len(noteList))
+                print(noteNumber)
+                instrument.notes.append(makeNote(noteList[noteNumber], noteTime + a, noteLong, 100))
+                pm.instruments.append(instrument)
+
+            updownFlag = np.random.randint(0,2)
             pm.instruments.append(instrument)
-            noteTime = noteTime +1
+            noteTime = noteTime + termLong
 
         pm.write('output/' + filename + '.mid')
-        # audio_data = pm.fluidsynth()
-        # music_max = np.max(np.abs(audio_data))
-        # muisc_array = (audio_data/music_max).astype(np.float32)
-        # wav_file_name = 'test.wav'
-        # wavfile.write(wav_file_name,44100, muisc_array)
-
-
 
 if __name__ == '__main__':
     main()
