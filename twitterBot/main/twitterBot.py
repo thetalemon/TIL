@@ -3,25 +3,7 @@
 
 from login import api
 from slacklogin import post2slack
-import requests
-import datetime
-from datetime import datetime as dt
-import time
-import requests
-import shutil
 import os
-
-def showLists(owner_name):
-    for twilist in api.lists_all(screen_name=owner_name):
-        print("slug="+twilist.slug)
-        print("name="+twilist.name)
-
-def download_img(url, file_name):
-    r = requests.get(url, stream=True)
-    if r.status_code == 200:
-        with open(file_name, 'wb') as f:
-            r.raw.decode_content = True
-            shutil.copyfileobj(r.raw, f)
 
 def create_twitter_url(id_str, screen_name):
     return 'https://twitter.com/' + str(screen_name) + '/status/' + str(id_str)
