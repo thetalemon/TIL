@@ -34,10 +34,10 @@ def main():
             break
         try :
             url=status.extended_entities['media'][0]['media_url']
+            post2slack(create_twitter_url(status.id, status.user.id))
         except:
             print("no image")
             pass #画像がないときはなにもしない
-        post2slack(create_twitter_url(status.id, status.user.id))
 
 if __name__ == "__main__":
     main()
