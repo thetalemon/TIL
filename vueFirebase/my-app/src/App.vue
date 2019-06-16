@@ -14,20 +14,19 @@
         <span class="mr-2">Latest Release</span>
       </v-btn>
     </v-toolbar> -->
-
     <v-content>
-      <HelloWorld/>
+      <index/>
     </v-content>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld'
+import index from './components/index'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    index
   },
   data () {
     return {
