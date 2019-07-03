@@ -4,3 +4,4 @@ slacklogin.py
 *.jpg
 *pycache*
 number.txt
+*.cache
