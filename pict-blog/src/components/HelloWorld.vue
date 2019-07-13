@@ -2,7 +2,7 @@
   <div class="hello">
     <h1>Hello {{ name }}!!</h1>
     <h1>{{ msg }}</h1>
-    <h2>Essential Links</h2>
+    <!-- <h2>Essential Links</h2>
     <ul>
       <li><a href="https://vuejs.org" target="_blank">Core Docs</a></li>
       <li><a href="https://forum.vuejs.org" target="_blank">Forum</a></li>
@@ -17,8 +17,31 @@
       <li><a href="http://vuex.vuejs.org/" target="_blank">vuex</a></li>
       <li><a href="http://vue-loader.vuejs.org/" target="_blank">vue-loader</a></li>
       <li><a href="https://github.com/vuejs/awesome-vue" target="_blank">awesome-vue</a></li>
-    </ul>
+    </ul> -->
     <button @click="signOut">Sign out</button>
+    <v-list three-line>
+      <template v-for="(comment, index) in comments">
+        <v-list-tile
+            :key="index"
+            avatar
+        >
+          <v-list-tile-avatar>
+            <img :src="comment.avatar">
+          </v-list-tile-avatar>
+
+          <v-list-tile-content>
+            <v-list-tile-sub-title class="text--primary subheading">{{comment.content}}</v-list-tile-sub-title>
+            <v-list-tile-sub-title>
+              {{comment.createdAt.toDate().toLocaleString()}}
+            </v-list-tile-sub-title>
+          </v-list-tile-content>
+
+          <v-list-tile-action>
+          </v-list-tile-action>
+        </v-list-tile>
+        <v-divider :key="comment.id"></v-divider>
+      </template>
+    </v-list>
   </div>
 </template>
 
@@ -27,17 +50,30 @@ import firebase from 'firebase'
 
 export default {
   name: 'HelloWorld',
-  data () {
-    return {
-      msg: 'Welcome to Your Vue.js App',
-      name: firebase.auth().currentUser.email
-    }
-  },
+  data: () => ({
+    // return {
+    msg: 'Welcome to Your Vue.js App',
+    name: firebase.auth().currentUser.email,
+    comments: []
+    // },
+  }),
+  // datas: () => ({
+  //   comments: []
+  // }),
+  // created () {
+  //   this.loadMessages()
+  // },
   methods: {
     signOut: function () {
       firebase.auth().signOut().then(() => {
         this.$router.push('/signin')
       })
+    }
+  },
+  firestore () {
+    return {
+      // firestoreのcommentsコレクションを参照
+      comments: firebase.collection('comments').orderBy('createdAt')
     }
   }
 }
