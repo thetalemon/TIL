@@ -19,50 +19,31 @@
       <li><a href="https://github.com/vuejs/awesome-vue" target="_blank">awesome-vue</a></li>
     </ul> -->
     <button @click="signOut">Sign out</button>
-    <v-list three-line>
-      <template v-for="(comment, index) in comments">
-        <v-list-tile
-            :key="index"
-            avatar
-        >
-          <v-list-tile-avatar>
-            <img :src="comment.avatar">
-          </v-list-tile-avatar>
-
-          <v-list-tile-content>
-            <v-list-tile-sub-title class="text--primary subheading">{{comment.content}}</v-list-tile-sub-title>
-            <v-list-tile-sub-title>
-              {{comment.createdAt.toDate().toLocaleString()}}
-            </v-list-tile-sub-title>
-          </v-list-tile-content>
-
-          <v-list-tile-action>
-          </v-list-tile-action>
-        </v-list-tile>
-        <v-divider :key="comment.id"></v-divider>
-      </template>
-    </v-list>
+      <table>
+        <tr>発言一覧</tr>
+        <!-- <tr>{{comments}}<tr> -->
+        <tr v-for="(comment, index) in comments" :key="index">
+        <td><img :src="comment.avatar"></td>
+          <td>{{comment.content}}</td>
+            <td>{{comment.createdAt}}</td>
+        <td>{{comment.id}}</td>
+      </tr>
+    </table>
   </div>
 </template>
 
 <script>
-import firebase from 'firebase'
+import firebase from 'firebase/app'
+import 'firebase/auth'
+import 'firebase/firestore'
 
 export default {
   name: 'HelloWorld',
   data: () => ({
-    // return {
     msg: 'Welcome to Your Vue.js App',
     name: firebase.auth().currentUser.email,
     comments: []
-    // },
   }),
-  // datas: () => ({
-  //   comments: []
-  // }),
-  // created () {
-  //   this.loadMessages()
-  // },
   methods: {
     signOut: function () {
       firebase.auth().signOut().then(() => {
@@ -70,12 +51,28 @@ export default {
       })
     }
   },
-  firestore () {
-    return {
-      // firestoreのcommentsコレクションを参照
-      comments: firebase.collection('comments').orderBy('createdAt')
-    }
+  created: function () {
+    firebase.firestore().collection('comments').get()
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          console.log(doc.id, '=>', doc.data())
+          this.comments.push({
+            avatar: doc.data().avatar,
+            content: doc.data().content,
+            createdAt: doc.data().createdAt.toDate().toLocaleString()
+          })
+        })
+      })
+      .catch((err) => {
+        console.log('Error getting documents', err)
+      })
   }
+  // firestore () {
+  //   return {
+  //     // firestoreのcommentsコレクションを参照
+  //     comments: firebase.firestore().collection('comments').orderBy('createdAt')
+  //   }
+  // }
 }
 </script>
 

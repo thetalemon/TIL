@@ -3,7 +3,8 @@ import Router from 'vue-router'
 import HelloWorld from '@/components/HelloWorld'
 import Signup from '@/components/Signup'
 import Signin from '@/components/Signin'
-import firebase from 'firebase'
+import firebase from 'firebase/app'
+import 'firebase/auth'
 
 Vue.use(Router)
 
