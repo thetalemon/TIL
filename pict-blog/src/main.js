@@ -12,7 +12,6 @@ Vue.use(VModal)
 const config = require('./config.js')
 firebase.initializeApp(config)
 
-
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
