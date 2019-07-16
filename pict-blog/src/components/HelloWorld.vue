@@ -1,22 +1,34 @@
 <template>
   <div class="hello">
-    <h1>Hello {{ name }}!!</h1>
+    <h1>Hello {{ login_username }}!!</h1>
+
+    <button v-if="login_username==''" @click="show_signin">サインインする</button>
+    <modal name="signin_modal" :adaptive="true" width="80%" height="80%">
+      <h2>Sign in</h2>
+      <input type="text" placeholder="Username" v-model="input_username">
+      <input type="password" placeholder="Password" v-model="input_password">
+      <button @click="signIn">サインインする</button>
+      <button @click="signUp">アカウントを作る</button>
+    </modal>
+
+    <button v-if="login_username!=''" @click="signOut">サインアウトする</button>
 
     <!-- 投稿フォーム -->
-    <button v-on:click="show_submit">投稿する</button>
+    <button v-if="login_username!=''" @click="show_submit">投稿する</button>
     <modal name="submit_modal" :adaptive="true"  width="80%" height="80%">
       <p><canvas ref="canvas" class="resize-img__preview__canvas"/></p>
       <p><input type="file" @change="onFileChange"></p>
+      <p><button @click="hide_submit">hide</button></p>
     </modal>
 
     <!-- 投稿一覧 -->
     <ul  class="box-list">
       <li v-for="(comment,key, index) in comments" :key="index">
-        <div><img class="top" :src="comment.content" v-on:click="show_img(key)"></div>
+        <div><img class="top" :src="comment.content" @click="show_img(key)"></div>
         <modal name="img_modal" :adaptive="true"  width="80%" height="80%">
           <p><img :src="modal_img"></p>
           <p>{{modal_createdAt}}</p>
-          <p><button v-on:click="hide">hide</button></p>
+          <p><button @click="hide_img">hide</button></p>
         </modal>
       </li>
     </ul>
@@ -32,13 +44,46 @@ import 'firebase/firestore'
 export default {
   name: 'HelloWorld',
   data: () => ({
-    name: firebase.auth().currentUser.email,
+    // name: firebase.auth().currentUser.email,
+    name: '',
     comments: [],
     modal_img: '',
     modal_createdAt: '',
-    uploadImage: ''
+    input_username: '',
+    input_password: '',
+    login_username: ''
   }),
   methods: {
+    signIn: function () {
+      firebase.auth().signInWithEmailAndPassword(this.input_username, this.input_password)
+        .then(user => {
+          this.login_username = firebase.auth().currentUser.email
+          this.$modal.hide('signin_modal')
+        },
+        err => {
+          alert(err.message)
+        })
+    },
+    signUp: function () {
+      firebase.auth().createUserWithEmailAndPassword(this.input_username, this.input_password)
+      firebase.auth().signInWithEmailAndPassword(this.input_username, this.input_password)
+        .then(user => {
+          this.login_username = firebase.auth().currentUser.email
+          this.$modal.hide('signin_modal')
+        })
+        .catch(error => {
+          alert(error.message)
+        })
+    },
+    signOut: function () {
+      firebase.auth().signOut()
+        .then(user => {
+          this.login_username = ''
+        })
+        .catch(error => {
+          alert(error.message)
+        })
+    },
     onFileChange (e) {
       e.preventDefault()
 
@@ -94,12 +139,13 @@ export default {
       ctx.drawImage(image, 0, 0, width, height, 0, 0, canvas.width, canvas.height)
       return canvas.toDataURL('image/jpeg')
     },
-    signOut: function () {
-      firebase.auth().signOut().then(() => {
-        this.$router.push('/signin')
-      })
+    show_signin: function () {
+      this.$modal.show('signin_modal')
     },
-    show_submit: function (key) {
+    hide_sigin: function () {
+      this.$modal.hide('signin_modal')
+    },
+    show_submit: function () {
       this.$modal.show('submit_modal')
     },
     hide_submit: function () {
@@ -111,7 +157,7 @@ export default {
       this.modal_img = this.comments[key].content
       this.modal_createdAt = this.comments[key].createdAt
     },
-    hide: function () {
+    hide_img: function () {
       this.$modal.hide('img_modal')
     }
   },
@@ -145,8 +191,6 @@ table{
   border: 2px #2b2b2b solid;
 }
 img {
-  /* align:center; */
-  /* padding: 0px; */
   margin: 10px;
 }
 img.top {
@@ -162,17 +206,11 @@ p{
   margin: 0px;
   padding: 0px;
   list-style: none;
-  /* justify-content: space-between; */
   flex-flow: row wrap;
-
 }
 .box-list li{
   flex: 0 0 10%;
-  /* border: 1px solid #ccc; */
   margin-bottom: 0px;
 }
-/* img{
-  width: 100%;
-} */
 
 </style>
