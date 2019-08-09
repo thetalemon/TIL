@@ -2,23 +2,24 @@
   <div class="hello">
     <h1>Hello {{ login_username }}!!</h1>
 
-    <button v-if="login_username==''" @click="show_signin">サインインする</button>
+    <button v-if="login_username==''" @click="show_modal('signin_modal')">サインインする</button>
     <modal name="signin_modal" :adaptive="true" width="80%" height="80%">
       <h2>Sign in</h2>
       <input type="text" placeholder="Username" v-model="input_username">
       <input type="password" placeholder="Password" v-model="input_password">
       <button @click="signIn">サインインする</button>
       <button @click="signUp">アカウントを作る</button>
+      <p><button @click="hide_modal('signin_modal')">hide</button></p>
     </modal>
 
     <button v-if="login_username!=''" @click="signOut">サインアウトする</button>
 
     <!-- 投稿フォーム -->
-    <button v-if="login_username!=''" @click="show_submit">投稿する</button>
+    <button v-if="login_username!=''" @click="show_modal('submit_modal')">投稿する</button>
     <modal name="submit_modal" :adaptive="true"  width="80%" height="80%">
       <p><canvas ref="canvas" class="resize-img__preview__canvas"/></p>
       <p><input type="file" @change="onFileChange"></p>
-      <p><button @click="hide_submit">hide</button></p>
+      <p><button @click="hide_modal('submit_modal')">hide</button></p>
     </modal>
 
     <!-- 投稿一覧 -->
@@ -28,7 +29,7 @@
         <modal name="img_modal" :adaptive="true"  width="80%" height="80%">
           <p><img :src="modal_img"></p>
           <p>{{modal_createdAt}}</p>
-          <p><button @click="hide_img">hide</button></p>
+          <p><button @click="hide_modal('img_modal')">hide</button></p>
         </modal>
       </li>
     </ul>
@@ -37,21 +38,23 @@
 </template>
 
 <script>
+import axios from 'axios'
 import firebase from 'firebase/app'
 import 'firebase/auth'
 import 'firebase/firestore'
+import 'firebase/storage'
 
 export default {
   name: 'HelloWorld',
   data: () => ({
-    // name: firebase.auth().currentUser.email,
     name: '',
     comments: [],
     modal_img: '',
     modal_createdAt: '',
     input_username: '',
     input_password: '',
-    login_username: ''
+    login_username: '',
+    labels: []
   }),
   methods: {
     signIn: function () {
@@ -90,26 +93,26 @@ export default {
       var file = e.target.files[0]
       const reader = new FileReader()
       reader.onload = (e) => {
-        this.generateImgUrl(e.target.result)
+        this.insertImg(e.target.result)
       }
       reader.readAsDataURL(file)
     },
-    generateImgUrl (file) {
+    insertImg (file) {
       const image = new Image()
       image.crossOrigin = 'Anonymous'
       image.onload = (e) => {
-        // データを指定した後の処理
-        // リサイズ・現在時刻取得
+        // リサイズ
         const resizedBase64 = this.makeResizeImg(image)
+        // 現在時刻
         let timestamp = firebase.firestore.FieldValue.serverTimestamp()
-
+        // this.insertStorage(resizedBase64)
+        this.post2VisionApi(resizedBase64)
         // DBへINSERT
         firebase.firestore().collection('picts').add({
           content: resizedBase64,
           uid: firebase.auth().currentUser.uid,
           createdAt: timestamp
         })
-
         // 投稿一覧へ追加
         this.comments.unshift({
           content: resizedBase64,
@@ -117,6 +120,73 @@ export default {
         })
       }
       image.src = file
+    },
+    insertStorage (img) {
+      var storageRef = firebase.storage().ref().child('mountains.jpg')
+      // storageRef.putString(resizedBase64, 'data_url').then(function (snapshot) {
+      //   console.log('Uploaded a base64url string!')
+      // })
+      console.log('a')
+
+      storageRef.getDownloadURL()
+        .then(url => {
+          console.log(url)
+        })
+    },
+    paramsSerializer (param) {
+      const qs = require('qs')
+
+      return qs.stringify(param, {arrayFormat: 'brackets'})
+    },
+    post2VisionApi (image) {
+      var str = image.replace('data:image/png;base64,', '')
+      const config = require('../config.js')
+      console.log(str)
+
+      // let params = new URLSearchParams()
+      // params.append('text', 'テストだよー');
+      // console.log('b')
+      // var param = {
+      //   // key: config.apiKey,
+      //   requests: [
+      //     {
+      //       image: {
+      //         content: str
+      //       },
+      //       features: [
+      //         {
+      //           type: 'LABEL_DETECTION',
+      //           maxResults: 3
+      //         }
+      //       ]
+      //     }
+      //   ]
+      // }
+      var param = {
+        image: {
+          content: str
+        },
+        features: [
+          {
+            type: 'LABEL_DETECTION',
+            maxResults: 3
+          }
+        ]
+      }
+      console.log(param)
+
+      // axios.post('https://vision.googleapis.com/v1/images:annotate?key=' + config.apiKey, param)
+
+      let request = new URLSearchParams()
+      request.append('key', config.apiKey)
+      // request.append('requests', this.paramsSerializer(param))
+      axios.post('https://vision.googleapis.com/v1/images:annotate', request, param)
+        .then(function (response) {
+          console.log(response)
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
     },
     makeResizeImg (image) {
       // リサイズするメソッド
@@ -137,49 +207,39 @@ export default {
         [canvas.width, canvas.height] = [((width * MAX_SIZE) / height), MAX_SIZE]
       }
       ctx.drawImage(image, 0, 0, width, height, 0, 0, canvas.width, canvas.height)
-      return canvas.toDataURL('image/jpeg')
+      return canvas.toDataURL('image/png')
     },
-    show_signin: function () {
-      this.$modal.show('signin_modal')
+    show_modal: function (modalName) {
+      this.$modal.show(modalName)
     },
-    hide_sigin: function () {
-      this.$modal.hide('signin_modal')
-    },
-    show_submit: function () {
-      this.$modal.show('submit_modal')
-    },
-    hide_submit: function () {
-      this.$modal.hide('submit_modal')
+    hide_modal: function (modalName) {
+      this.$modal.hide(modalName)
     },
     show_img: function (key) {
       this.$modal.show('img_modal')
       // モーダル内の画像を対象画像に差し替える
       this.modal_img = this.comments[key].content
       this.modal_createdAt = this.comments[key].createdAt
-    },
-    hide_img: function () {
-      this.$modal.hide('img_modal')
     }
   },
   created: function () {
-    firebase.firestore().collection('picts').orderBy('createdAt', 'desc').get()
-      .then((snapshot) => {
-        snapshot.forEach((doc) => {
-          console.log(doc.id, '=>', doc.data())
-          this.comments.push({
-            content: doc.data().content,
-            createdAt: doc.data().createdAt.toDate().toLocaleString()
-          })
-        })
-      })
-      .catch((err) => {
-        console.log('Error getting documents', err)
-      })
+    // firebase.firestore().collection('picts').orderBy('createdAt', 'desc').get()
+    //   .then((snapshot) => {
+    //     snapshot.forEach((doc) => {
+    //       console.log(doc.id, '=>', doc.data())
+    //       this.comments.push({
+    //         content: doc.data().content,
+    //         createdAt: doc.data().createdAt.toDate().toLocaleString()
+    //       })
+    //     })
+    //   })
+    //   .catch((err) => {
+    //     console.log('Error getting documents', err)
+    //   })
   }
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 h1, h2 {
   font-weight: normal;
@@ -212,5 +272,4 @@ p{
   flex: 0 0 10%;
   margin-bottom: 0px;
 }
-
 </style>
