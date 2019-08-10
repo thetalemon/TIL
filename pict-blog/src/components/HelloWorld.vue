@@ -136,57 +136,42 @@ export default {
     paramsSerializer (param) {
       const qs = require('qs')
 
-      return qs.stringify(param, {arrayFormat: 'brackets'})
+      return qs.stringify(param)
     },
     post2VisionApi (image) {
       var str = image.replace('data:image/png;base64,', '')
       const config = require('../config.js')
-      console.log(str)
 
-      // let params = new URLSearchParams()
-      // params.append('text', 'テストだよー');
-      // console.log('b')
-      // var param = {
-      //   // key: config.apiKey,
-      //   requests: [
-      //     {
-      //       image: {
-      //         content: str
-      //       },
-      //       features: [
-      //         {
-      //           type: 'LABEL_DETECTION',
-      //           maxResults: 3
-      //         }
-      //       ]
-      //     }
-      //   ]
-      // }
       var param = {
-        image: {
-          content: str
-        },
-        features: [
+        requests: [
           {
-            type: 'LABEL_DETECTION',
-            maxResults: 3
+            image: {
+              content: str
+            },
+            features: [
+              {
+                type: 'LABEL_DETECTION',
+                maxResults: 3
+              }
+            ]
           }
         ]
       }
-      console.log(param)
 
-      // axios.post('https://vision.googleapis.com/v1/images:annotate?key=' + config.apiKey, param)
-
-      let request = new URLSearchParams()
-      request.append('key', config.apiKey)
-      // request.append('requests', this.paramsSerializer(param))
-      axios.post('https://vision.googleapis.com/v1/images:annotate', request, param)
-        .then(function (response) {
-          console.log(response)
-        })
-        .catch(function (error) {
-          console.log(error)
-        })
+      axios({
+        method: 'post',
+        url: 'https://vision.googleapis.com/v1/images:annotate?key=' + config.apiKey,
+        data: param,
+        config: {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      }).then(function (response) {
+        console.log(response)
+      }).catch(function (error) {
+        console.log(error)
+      })
     },
     makeResizeImg (image) {
       // リサイズするメソッド
