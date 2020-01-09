@@ -10,12 +10,12 @@
 </template>
 
 <script>
-import EyeCatch from './components/EyeCatch.vue'
-import Links from './components/Links.vue'
-import MenuBar from './components/MenuBar.vue'
-import Profile from './components/Profile.vue'
-import Skills from './components/Skills.vue'
-import Works from './components/Works.vue'
+import EyeCatch from './components/pages/EyeCatch.vue'
+import Links from './components/pages/Links.vue'
+import MenuBar from './components/pages/MenuBar.vue'
+import Profile from './components/pages/Profile.vue'
+import Skills from './components/pages/Skills.vue'
+import Works from './components/pages/Works.vue'
 
 export default {
   name: 'app',
@@ -30,13 +30,15 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+@import './unified.scss';
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  color: $light-font-color;
+  background-color: $main-background-color;
+  padding: $micro $zero;
 }
 </style>
