@@ -4,9 +4,9 @@
       <template slot="field-content">
         <SkillTip v-for="(value, key) in skills"
           :key="key"
-          :title=value.name
-          :star=value.star
-          :description=value.description
+          :title="value.name"
+          :star="value.star"
+          :description="value.description"
         />
       </template>
     </ContentField>
