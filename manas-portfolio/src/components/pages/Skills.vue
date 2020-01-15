@@ -2,12 +2,14 @@
   <div id="skills">
     <ContentField title='skills'>
       <template slot="field-content">
-        <SkillTip v-for="(value, key) in skills"
-          :key="key"
-          :title="value.name"
-          :star="value.star"
-          :description="value.description"
-        />
+        <div class="content">
+          <SkillTip v-for="(value, key) in skills"
+            :key="key"
+            :title="value.name"
+            :star="value.star"
+            :description="value.description"
+          />
+        </div>
       </template>
     </ContentField>
   </div>
@@ -33,5 +35,10 @@ export default {
 
 <style lang="scss" scoped>
 @import '../../unified.scss';
+.content {
+  background-color: red;
+  display: flex;
+  flex-wrap : wrap;
+}
 
 </style>

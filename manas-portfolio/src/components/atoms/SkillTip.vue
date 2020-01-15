@@ -1,5 +1,5 @@
 <template>
-  <div class="content-field">
+  <div class="skill-tip">
     <div class="title">
       <div class="title-text">{{title}} </div>
       <Stars :star="star" />
@@ -27,7 +27,7 @@ export default {
 
 <style lang="scss" scoped>
 @import '../../unified.scss';
-.content-field {
+.skill-tip {
   width: 200px;
   justify-content: start;
   .title{

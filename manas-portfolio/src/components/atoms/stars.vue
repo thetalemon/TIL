@@ -1,6 +1,6 @@
 <template>
   <div class="stars">
-    <div v-for="a in calcStar(star)" :key="a">
+    <div v-for="(a, key) in calcStar(star)" :key="key">
       {{ a }}
     </div>
   </div>
@@ -10,9 +10,7 @@
 export default {
   name: 'Stars',
   props: {
-    title: String,
-    star: Number,
-    description: String
+    star: Number
   },
   methods: {
     calcStar: function (star) {
