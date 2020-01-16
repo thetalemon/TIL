@@ -19,7 +19,7 @@ export default {
   },
   props: {
     title: String,
-    star: Number,
+    star: {type:Number, required:false},
     description: String
   }
 }
