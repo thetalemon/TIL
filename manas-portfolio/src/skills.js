@@ -54,3 +54,18 @@ export const SKILLS = {
     }
   ]
 }
+
+export const LINKS = [
+  {
+    name: "tumblr(photos)",
+    url: "https://thetalemon.tumblr.com/"
+  },
+  {
+    name: "tumblr(illustrations)",
+    url: "https://lemontheta.tumblr.com/"
+  },
+  {
+    name: "twitter",
+    url: "https://twitter.com/thetalemon"
+  }
+]
