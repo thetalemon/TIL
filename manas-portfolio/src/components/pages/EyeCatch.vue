@@ -17,7 +17,7 @@ export default {
 <style lang="scss" scoped>
 @import '../../unified.scss';
 #eye-catch {
-  position: relative;;/*絶対配置*/
+  position: relative;
   background-color: $dark-background-color;
   margin: $little $little;
   padding: $micro;
