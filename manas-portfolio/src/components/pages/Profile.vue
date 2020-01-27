@@ -2,7 +2,6 @@
   <div id="profile">
     <ContentField title='profile'>
       <template slot="field-content">
-        <!-- <h3>happy happy magician</h3> -->
         <div id="center-area">
           <img id="prof-icon" src="../../assets/ico.jpg">
           <h1>Mana（theta）</h1>

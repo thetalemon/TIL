@@ -1,11 +1,11 @@
 <template>
   <div id="app">
-    <EyeCatch msg="Welcome to Your Vue.js App"/>
-    <MenuBar msg="Welcome to Your Vue.js App"/>
-    <Profile msg="Welcome to Your Vue.js App"/>
-    <Skills msg="Welcome to Your Vue.js App"/>
-    <Works msg="Welcome to Your Vue.js App"/>
-    <Links msg="Welcome to Your Vue.js App"/>
+    <EyeCatch/>
+    <MenuBar/>
+    <Profile name="profile"/>
+    <Skills/>
+    <Works/>
+    <Links/>
   </div>
 </template>
 

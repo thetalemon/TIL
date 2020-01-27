@@ -1,7 +1,7 @@
 <template>
   <div class="skill-tip">
     <div class="title">
-      <div class="title-text">{{title}} </div>
+      <div class="title-text">{{title}}</div>
       <Stars :star="star" />
     </div>
     <div class="content">

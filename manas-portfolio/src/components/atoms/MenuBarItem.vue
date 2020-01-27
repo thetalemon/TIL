@@ -1,6 +1,6 @@
 <template>
   <div class="menubar-item">
-    {{msg}}
+    <a :href="anchor">{{text}}</a>
   </div>
 </template>
 
@@ -8,7 +8,12 @@
 export default {
   name: 'MenuBar',
   props: {
-    msg: String
+    text: String
+  },
+  computed: {
+    anchor: function () {
+      return '#' + this.text
+    }
   }
 }
 </script>
@@ -20,5 +25,13 @@ export default {
   padding: $micro $little;
   background-color: $dark-background-color;
   color: $light-font-color;
+
+  a {
+    text-decoration: none;
+  }
+  a:link { color: $light-font-color; }
+  a:visited { color: $light-font-color; }
+  a:hover { color: #ffffff; }
+  a:active { color: #ffffff; }
 }
 </style>
