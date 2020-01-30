@@ -1,11 +1,16 @@
 <template>
   <div id="app">
-    <!-- <img alt="Vue logo" src="./assets/logo.png"> -->
-    <!-- <HelloWorld msg="Welcome to Your Vue.js App"/> -->
-    過去データから続きを実行みたいな感じでここにテキストボックスをおく<br>
-    convertボタン<br>
+    <textarea v-model="message" placeholder="add multiple lines"></textarea><br>
+    <div style="white-space:pre-wrap; word-wrap:break-word;">{{message}}</div><br>
+    <div v-for="(row, key) in messages" :key="key">
+      {{row}}
+    </div>
+    <div @click="convert()">convert!</div>
+    {{converted}}<br>
+    <br>
+    ↑に過去のYWTをおいてそれをパースできるようにする<br>
     なんか入力欄<br>
-    項目名<br>
+    項目名<input></input><br>
     よていは<br>
     やった<br>
     わかった<br>
@@ -22,7 +27,25 @@ export default {
   name: 'app',
   components: {
     // HelloWorld
+  },
+  data: function () {
+    return {
+      message: '',
+      converted: ''
+    }
+  },
+  computed: {
+    messages: function () {
+      var textArray = this.message.split(/\r\n|\r|\n/);
+      return textArray
+    }
+  },
+  methods: {
+    convert: function () {
+      this.converted = this.message
+    }
   }
+
 }
 </script>
 
