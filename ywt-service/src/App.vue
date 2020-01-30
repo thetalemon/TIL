@@ -8,15 +8,17 @@
     <div @click="convert()">convert!</div>
     {{converted}}<br>
     <br>
-    ↑に過去のYWTをおいてそれをパースできるようにする<br>
-    なんか入力欄<br>
-    項目名<input></input><br>
-    よていは<br>
-    やった<br>
-    わかった<br>
-    つぎは<br>
-    outputボタン<br>
-    ここにアウトプットが出力されるテキストボックスをおく<br>
+    項目名:<input v-model="item.name" placeholder="edit me"><br>
+    よていは:<input v-model="item.plan" placeholder="edit me"><br>
+    やった:<input v-model="item.y" placeholder="edit me"><br>
+    わかった:<input v-model="item.w" placeholder="edit me"><br>
+    つぎは:<input v-model="item.t" placeholder="edit me"><br>
+    <br>
+    <div @click="output()">output!</div>
+    {{output_text}}<br>
+    <br>
+    <textarea class="output-area" v-model="output_text" placeholder="add multiple lines"></textarea><br>
+
   </div>
 </template>
 
@@ -31,7 +33,9 @@ export default {
   data: function () {
     return {
       message: '',
-      converted: ''
+      converted: '',
+      output_text: '',
+      item:{}
     }
   },
   computed: {
@@ -43,6 +47,9 @@ export default {
   methods: {
     convert: function () {
       this.converted = this.message
+    },
+    output: function () {
+      this.output_text = this.item.name + '\n' + this.item.plan + '\n' + this.item.y + '\n' + this.item.w + '\n' + this.item.t
     }
   }
 
@@ -57,5 +64,9 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+.output-area {
+  width:500px;
+  height:300px;
 }
 </style>
