@@ -2,12 +2,9 @@
   <div id="app">
     <textarea v-model="message" placeholder="add multiple lines"></textarea><br>
     <div style="white-space:pre-wrap; word-wrap:break-word;">{{message}}</div><br>
-    <!-- <div v-for="(row, key) in messages" :key="key">
-      {{row}}
-    </div> -->
     <div @click="convert()">convert!</div>
     <div style="white-space:pre-wrap; word-wrap:break-word;">{{converted}}</div><br>
-    <!-- {{converted}}<br> -->
+    <div style="white-space:pre-wrap; word-wrap:break-word;">{{converted_bottom}}</div><br>
     <br>
     項目名:<input v-model="item.name" placeholder="edit me"><br>
     よていは:<input v-model="item.plan" placeholder="edit me"><br>
@@ -33,30 +30,29 @@ export default {
     return {
       message: '',
       converted: '',
+      converted_bottom: '',
       output_text: '',
       item:{}
     }
   },
   computed: {
-    // messages: function () {
-    //   var textArray = this.message.split(/\r\n|\r|\n/);
-    //   textArray.match(/[^-.*]/g)
-    //   // for(text of textArray){
-    //   //
-    //   // }
-    //   return textArray.match(/[^-.*]/g)
-    // }
   },
   methods: {
     convert: function () {
       var textArray = this.message.split(/\r\n|\r|\n/);
       let matchingArray = []
+      let matchingArray_bottom = []
+
       for(let text of textArray){
         if(text.match(/^[-].*/g)){
           matchingArray.push(text.match(/^[-].*/g))
         }
+        if(text.match(/^[ ]{4}[-].*/g)){
+          matchingArray_bottom.push(text.match(/^[ ]{4}[-].*/g))
+        }
       }
       this.converted = matchingArray
+      this.converted_bottom = matchingArray_bottom
     },
     output: function () {
       this.output_text = this.item.name + '\n' + this.item.plan + '\n' + this.item.y + '\n' + this.item.w + '\n' + this.item.t
