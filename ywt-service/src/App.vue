@@ -32,7 +32,7 @@ export default {
       converted: '',
       converted_bottom: '',
       output_text: '',
-      item:{}
+      item:[]
     }
   },
   computed: {
@@ -40,19 +40,30 @@ export default {
   methods: {
     convert: function () {
       var textArray = this.message.split(/\r\n|\r|\n/);
-      let matchingArray = []
-      let matchingArray_bottom = []
+
+      let all_content_set = []
+      let current_content_set = undefined
 
       for(let text of textArray){
         if(text.match(/^[-].*/g)){
-          matchingArray.push(text.match(/^[-].*/g))
+          // 次のコンテンツになったら前のコンテンツは配列にいれて現在のコンテンツを保つ変数を初期化
+          if(current_content_set){
+            all_content_set.push(current_content_set)
+          }
+          current_content_set = {
+            name: undefined,
+            content: []
+          }
+          let name = text.match(/^[-].*/g)[0].replace(/^[-][ ]/g, '')
+          current_content_set.name = name
         }
         if(text.match(/^[ ]{4}[-].*/g)){
-          matchingArray_bottom.push(text.match(/^[ ]{4}[-].*/g))
+          let content = text.match(/^[ ]{4}[-].*/g)[0].replace(/^[ ]{4}[-][ ]/g, '')
+          current_content_set.content.push(content)
         }
       }
-      this.converted = matchingArray
-      this.converted_bottom = matchingArray_bottom
+      all_content_set.push(current_content_set)
+      this.converted_bottom = all_content_set
     },
     output: function () {
       this.output_text = this.item.name + '\n' + this.item.plan + '\n' + this.item.y + '\n' + this.item.w + '\n' + this.item.t
