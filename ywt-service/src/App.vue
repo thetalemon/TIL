@@ -1,5 +1,7 @@
 <template>
   <div id="app">
+    <Navigation />
+
     <textarea v-model="message" placeholder="add multiple lines"></textarea><br>
     <div style="white-space:pre-wrap; word-wrap:break-word;">{{message}}</div><br>
     <div @click="convert()">convert!</div>
@@ -21,10 +23,11 @@
 </template>
 
 <script>
-
+import Navigation from "@/components/Nav.vue";
 export default {
   name: 'app',
   components: {
+    Navigation
   },
   data: function () {
     return {
