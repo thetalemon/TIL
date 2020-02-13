@@ -8,6 +8,7 @@
     <div style="white-space:pre-wrap; word-wrap:break-word;">{{converted}}</div><br>
     <div style="white-space:pre-wrap; word-wrap:break-word;">{{converted_bottom}}</div><br>
     <br>
+    {{user.displayName}}
     項目名:<input v-model="item.name" placeholder="edit me"><br>
     よていは:<input v-model="item.plan" placeholder="edit me"><br>
     やった:<input v-model="item.y" placeholder="edit me"><br>
@@ -39,6 +40,10 @@ export default {
     }
   },
   computed: {
+
+      user() {
+        return this.$store.getters.user;
+      },
   },
   methods: {
     convert: function () {
