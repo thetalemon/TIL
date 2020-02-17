@@ -1,0 +1,19 @@
+version: "2"
+services:
+
+  server:
+    build: ./server
+    image : server
+    ports:
+      - "3031:3031"
+    environment:
+      TZ: "Asia/Tokyo"
+
+  nginx:
+    build: ./local
+    links:
+      - server
+    ports:
+      - "80:80"
+    environment:
+      TZ: "Asia/Tokyo"

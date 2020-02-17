@@ -1,0 +1,13 @@
+# Pythonは公式イメージ
+FROM python:3.8.0
+
+# 各ライブラリインストール
+RUN apt-get update
+RUN apt-get upgrade -y
+RUN apt-get install -y 	vim sudo apache2 libapache2-mod-wsgi-py3
+
+RUN pip3 install Flask
+
+# Apache起動
+EXPOSE 80
+CMD ["apachectl", "-D", "FOREGROUND"]
