@@ -39,7 +39,13 @@ export default {
       .catch((err) => {
         console.log('Error getting documents', err)
       })
-    console.log(comments)
     return comments
+  },
+  insertTodoItemList () {
+    // firebase.firestore().collection('TODO_ITEM').add({
+    //   content: 'aaaa',
+    //   uid: store.state.user.uid,
+    //   create_at: firebase.firestore.FieldValue.serverTimestamp()
+    // })
   }
 }

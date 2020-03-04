@@ -10,10 +10,19 @@
 <script>
 import Firebase from './../firebase'
 import Navigation from '@/components/Nav.vue'
+import { mapState } from 'vuex'
 export default {
   name: 'HelloWorld',
   components: {
     Navigation
+  },
+  computed: mapState(['user']),
+  watch: {
+    user: function () {
+      if (this.user.displayName) {
+        Firebase.insertTodoItemList()
+      }
+    }
   },
   data () {
     return {
@@ -21,12 +30,12 @@ export default {
     }
   },
   created: function () {
+    // TODO これでちゃんとデータはとれるが、いれたてほやほやのデータでエラーになる
     this.todo_item_list = Firebase.getTodoItemList()
   }
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 h1, h2 {
   font-weight: normal;
