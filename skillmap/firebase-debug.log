@@ -1,0 +1,31 @@
+[debug] [2020-05-10T14:43:58.878Z] ----------------------------------------------------------------------
+[debug] [2020-05-10T14:43:58.884Z] Command:       /Users/sasakimanami/.nodebrew/node/v11.14.0/bin/node /Users/sasakimanami/.nodebrew/current/bin/firebase deploy
+[debug] [2020-05-10T14:43:58.884Z] CLI Version:   8.2.0
+[debug] [2020-05-10T14:43:58.885Z] Platform:      darwin
+[debug] [2020-05-10T14:43:58.885Z] Node Version:  v11.14.0
+[debug] [2020-05-10T14:43:58.886Z] Time:          Sun May 10 2020 23:43:58 GMT+0900 (GMT+09:00)
+[debug] [2020-05-10T14:43:58.886Z] ----------------------------------------------------------------------
+[debug] [2020-05-10T14:43:58.886Z] 
+[debug] [2020-05-10T14:43:58.907Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2020-05-10T14:43:58.908Z] > authorizing via signed-in user
+[debug] [2020-05-10T14:43:58.909Z] [iam] checking project manas-skillmap for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2020-05-10T14:43:58.916Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/manas-skillmap:testIamPermissions  
+ {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2020-05-10T14:44:00.464Z] <<< HTTP RESPONSE 200 {"content-type":"application/json; charset=UTF-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","date":"Sun, 10 May 2020 14:43:59 GMT","server":"ESF","cache-control":"private","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","server-timing":"gfet4t7; dur=698","alt-svc":"h3-27=\":443\"; ma=2592000,h3-25=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q049=\":443\"; ma=2592000,h3-Q048=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"","accept-ranges":"none","transfer-encoding":"chunked"}
+[debug] [2020-05-10T14:44:00.467Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/manas-skillmap  
+ 
+[debug] [2020-05-10T14:44:01.430Z] <<< HTTP RESPONSE 200 {"content-type":"application/json; charset=UTF-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","date":"Sun, 10 May 2020 14:44:01 GMT","server":"ESF","cache-control":"private","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","alt-svc":"h3-27=\":443\"; ma=2592000,h3-25=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q049=\":443\"; ma=2592000,h3-Q048=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"","accept-ranges":"none","transfer-encoding":"chunked"}
+[info] 
+[info] === Deploying to 'manas-skillmap'...
+[info] 
+[info] i  deploying hosting
+[debug] [2020-05-10T14:44:01.437Z] >>> HTTP REQUEST POST https://firebasehosting.googleapis.com/v1beta1/sites/manas-skillmap/versions  
+ {"config":{},"labels":{"deployment-tool":"cli-firebase"}}
+[debug] [2020-05-10T14:44:03.528Z] <<< HTTP RESPONSE 200 {"content-type":"application/json; charset=UTF-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","date":"Sun, 10 May 2020 14:44:03 GMT","server":"ESF","cache-control":"private","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","alt-svc":"h3-27=\":443\"; ma=2592000,h3-25=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q049=\":443\"; ma=2592000,h3-Q048=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"","accept-ranges":"none","transfer-encoding":"chunked"}
+[info] i  hosting[manas-skillmap]: beginning deploy...
+[info] i  hosting[manas-skillmap]: found 2 files in dist
+[debug] [2020-05-10T14:44:03.542Z] [hosting] hash cache [ZGlzdA] not populated
+[debug] [2020-05-10T14:44:03.554Z] [hosting] hash cache [ZGlzdA] stored for 2 files
+[debug] [2020-05-10T14:44:03.554Z] [hosting][hash queue][FINAL] {"max":8,"min":7,"avg":7.5,"active":0,"complete":2,"success":2,"errored":0,"retried":0,"total":2,"elapsed":12}
+[debug] [2020-05-10T14:44:03.555Z] >>> HTTP REQUEST POST https://firebasehosting.googleapis.com/v1beta1/sites/manas-skillmap/versions/bf0d499d3a630029:populateFiles  
+ <request body omitted>
