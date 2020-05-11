@@ -1,37 +1,36 @@
 <template>
   <div id="skill-map">
-    [memo]<br>
-    ・データ編集<br>
-    ・ソート<br>
-    ・カラムはカラム合計でソートされるように<br>
-    ・合計を視覚的に<br>
 
     <button @click="onClickAddData()">add new data</button>
-    <div class="categories">
-      <div class="name-cell"></div>
-      <div
-        class="category"
-        v-for="(cat, key) in skill_category_list"
-        @click="addOpenFlg(cat.id)"
-        :key="key"
-      >
-        {{cat.name}}
-        <div class="skills">
-          <div
-            v-for="(skill, key) in getSkillsByCategoryId(cat.id)"
-            :key="key"
-          >
+    <button @click="onClickOpenMemo()">memo</button><br>
+    <div class='header'>
+      <div class="categories">
+        <div class="name-cell"></div>
+        <div
+          class="category"
+          :class="{'frontend':cat.id === 1, 'backend':cat.id === 2, 'infra':cat.id === 3, 'research':cat.id === 4, 'other':cat.id === 5}"
+          v-for="(cat, key) in skill_category_list"
+          @click="addOpenFlg(cat.id)"
+          :key="key"
+        >
+          {{cat.name}}
+          <div class="skills">
             <div
-              class='skill'
-              v-if="getIsOpen(cat.id)"
+              v-for="(skill, key) in getSkillsByCategoryId(cat.id)"
+              :key="key"
             >
-              {{skill.name}}
+              <div
+                class='skill'
+                v-if="getIsOpen(cat.id)"
+              >
+                {{skill.name}}
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <div>
+    <div class="data-area">
       <div
         class="user-row"
         v-for="(user, key) in user_list"
@@ -42,11 +41,21 @@
         </div>
         <div
           class="category"
+          :class="{'frontend':cat.id === 1, 'backend':cat.id === 2, 'infra':cat.id === 3, 'research':cat.id === 4, 'other':cat.id === 5}"
           v-for="(cat, key) in skill_category_list"
           @click="addOpenFlg(cat.id)"
           :key="key"
         >
-            {{calcCategoryTotal(user.id, cat.id)}}
+
+          <div
+            class="bar-area"
+            :class="{ 'height-half':getIsOpen(cat.id), 'height-full':!getIsOpen(cat.id) }"
+          >
+            <div
+              class="bar"
+              :style="{ width: 100-getCategoryPercent(user.id, cat.id) + 'px' }"
+            > </div>
+          </div>
           <div class="skills" v-if="getIsOpen(cat.id)">
             <div
               v-for="(skill, key) in getSkillsByCategoryId(cat.id)"
@@ -67,7 +76,7 @@
         </div>
       </div>
     </div>
-    <div v-if="isModalOpen" id="overlay">
+    <div v-if="isAddModalOpen" id="overlay">
       <div id="modal-content">
         <p>name: <input v-model="inputName" type=text><p>
         <div
@@ -106,8 +115,20 @@
           <button @click="onClickSubmit()">submit</button>
           <button @click="onClickClosemodal()">cancel</button>
         </p>
+      </div>
     </div>
+
+    <div v-if="isMemoModalOpen" id="overlay">
+      <div id="modal-content">
+        [todo]<br>
+      ・データ編集<br>
+      ・ソート<br>
+      ・カラムはカラム合計でソートされるように<br>
+        <button @click="onCliclCloseMemo()">cancel</button>
+
+      </div>
     </div>
+
   </div>
 
 </template>
@@ -129,14 +150,37 @@ export default {
     },
     users_skills: function () {
       return USER_SKILLS
+    },
+    category_score_list: function () {
+      let scoreList = []
+      for (let user of this.user_list) {
+        for (let category of this.skill_category_list) {
+          let userSkills = this.getSkillsByUserId(user.id)
+          let categorySkills = this.getSkillsByCategoryId(category.id)
+          let total = 0
+          for (let skill of categorySkills) {
+            let s = userSkills.filter(x => x.sid === skill.id)[0]
+            if (s) {
+              total += parseInt(s.score)
+            }
+          }
+          scoreList.push({
+            'uid': user.id,
+            'category_id': category.id,
+            'score': total
+          })
+        }
+      }
+      return scoreList
     }
   },
   data () {
     return {
       msg: 'Welcome to Your Vue.js App',
-      isSkillOpen: [1, 2],
-      isModalOpen: false,
+      isSkillOpen: [],
+      isAddModalOpen: false,
       inputName: undefined,
+      isMemoModalOpen: false,
       inputData: [],
       inputSkills: [],
       inputScore: []
@@ -186,23 +230,30 @@ export default {
       }
       return array
     },
-    calcCategoryTotal: function (userId, categoryId) {
-      let userSkills = this.getSkillsByUserId(userId)
-      let categorySkills = this.getSkillsByCategoryId(categoryId)
-      let total = 0
-      for (let skill of categorySkills) {
-        let s = userSkills.filter(x => x.sid === skill.id)[0]
-        if (s) {
-          total += parseInt(s.score)
-        }
+    getCategoryTotal: function (userId, categoryId) {
+      return this.category_score_list.filter(x => x.uid === userId).filter(x => x.category_id === categoryId)[0].score
+    },
+    getCategoryPercent: function (userId, categoryId) {
+      let array = []
+      for (let cat of this.category_score_list.filter(x => x.category_id === categoryId)) {
+        array.push(cat.score)
       }
-      return total
+      let maxScore = Math.max.apply(null, array)
+      console.log(maxScore)
+      return this.category_score_list.filter(x => x.uid === userId).filter(x => x.category_id === categoryId)[0].score / maxScore * 100
     },
     onClickAddData: function () {
-      this.isModalOpen = true
+      this.isAddModalOpen = true
     },
     onClickClosemodal: function () {
-      this.isModalOpen = false
+      this.isAddModalOpen = false
+    },
+
+    onClickOpenMemo: function () {
+      this.isMemoModalOpen = true
+    },
+    onClickCloseMemo: function () {
+      this.isMemoModalOpen = false
     },
     onClickSkillPlus: function (categoryId) {
       let inputSkillNames = []
@@ -264,7 +315,7 @@ export default {
           })
           this.inputName = undefined
           this.inputData = []
-          this.isModalOpen = false
+          this.isAddModalOpen = false
         }
       }
     }
@@ -274,20 +325,25 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h1,
-h2 {
-  font-weight: normal;
+.frontend {
+  color: #fef4f4;
+  background-color: #f4b3c2;
 }
-ul {
-  list-style-type: none;
-  padding: 0;
+.backend {
+  color: #fef4f4;
+  background-color: #84b9cb;
 }
-li {
-  display: inline-block;
-  margin: 0 10px;
+.infra {
+  color: #fef4f4;
+  background-color: #7ebea5;
 }
-a {
-  color: #42b983;
+.research {
+  color: #fef4f4;
+  background-color: #a59aca;
+}
+.other {
+  color: #fef4f4;
+  background-color: #f7b977;
 }
 .categories {
   border: 2px solid #000000;
@@ -296,9 +352,24 @@ a {
 }
 .category {
   text-align: center;
-  margin: 2px;
   border-left: 2px solid #000000;
-  min-width: 200px;
+  min-width: 100px;
+}
+.bar-area{
+  height:100%;
+  width:100%;
+  display: flex;
+  flex-direction: row-reverse;
+  margin-bottom: 3px;
+}
+.bar{
+  background-color: white;
+}
+.height-full{
+  height:100%;
+}
+.height-half{
+  height:50%;
 }
 .skills {
   display: flex;
@@ -321,7 +392,8 @@ a {
 .user-row {
   margin: 2px;
   border: 2px solid #000000;
-  background-color:bisque;
+  /* background-color:bisque; */
+  height:45px;
   display: inline-flex;
 }
 .name-cell {
@@ -356,5 +428,16 @@ a {
 }
 #skill-map{
   text-align: left;
+}
+.header {
+  position: fixed;
+  /* left-margin:0px; */
+  /* left: 2px; */
+}
+.data-area {
+  position: fixed;
+  top:60px;
+  height:85%;
+  overflow: scroll;
 }
 </style>
