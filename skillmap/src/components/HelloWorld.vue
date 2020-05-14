@@ -23,53 +23,61 @@
                 class='skill'
                 v-if="getIsOpen(cat.id)"
               >
-                {{skill.name}}
+                {{skill.id}}
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <div class="data-area">
-      <div
-        class="user-row"
-        v-for="(user, key) in user_list"
-        :key="key"
-      >
-        <div class="name-cell">
-          {{user.name}}
-        </div>
+    <div
+      class="data-area"
+      :class="{'is-skill-open':any_skill_open, 'is-skill-close':!any_skill_open}"
+    >
+      <div>
         <div
-          class="category"
-          :class="{'frontend':cat.id === 1, 'backend':cat.id === 2, 'infra':cat.id === 3, 'research':cat.id === 4, 'other':cat.id === 5}"
-          v-for="(cat, key) in skill_category_list"
-          @click="addOpenFlg(cat.id)"
+          class="user-row"
+          v-for="(user, key) in user_list"
           :key="key"
         >
-
-          <div
-            class="bar-area"
-            :class="{ 'height-half':getIsOpen(cat.id), 'height-full':!getIsOpen(cat.id) }"
-          >
+          <div class="user-content">
+            <div class="name-cell">
+              {{user.name}}
+            </div>
             <div
-              class="bar"
-              :style="{ width: 100-getCategoryPercent(user.id, cat.id) + 'px' }"
-            > </div>
-          </div>
-          <div class="skills" v-if="getIsOpen(cat.id)">
-            <div
-              v-for="(skill, key) in getSkillsByCategoryId(cat.id)"
+              class="category"
+              :class="{'frontend':cat.id === 1, 'backend':cat.id === 2, 'infra':cat.id === 3, 'research':cat.id === 4, 'other':cat.id === 5}"
+              v-for="(cat, key) in skill_category_list"
+              @click="addOpenFlg(cat.id)"
               :key="key"
             >
+
               <div
-                class='skill score-cell'
-                v-if="getScoreByUidAndSid(user.id, skill.id)"
+                v-if="!computing"
+                class="bar-area"
+                :class="{ 'height-half':getIsOpen(cat.id), 'height-full':!getIsOpen(cat.id) }"
               >
-                <div v-for="(star, key) in calcStar(getScoreByUidAndSid(user.id, skill.id))" :key="key">
-                  {{ star }}
-                </div>
+                <div
+                  class="bar"
+                  :style="{ width: 100-getCategoryPercent(user.id, cat.id) + '%' }"
+                > </div>
               </div>
-              <div v-else class='empty-skill'>
+              <div class="skills" v-if="getIsOpen(cat.id)">
+                <div
+                  v-for="(skill, key) in getSkillsByCategoryId(cat.id)"
+                  :key="key"
+                >
+                  <div
+                    class='skill score-cell'
+                    v-if="getScoreByUidAndSid(user.id, skill.id)"
+                  >
+                    <div v-for="(star, key) in calcStar(getScoreByUidAndSid(user.id, skill.id))" :key="key">
+                      {{ star }}
+                    </div>
+                  </div>
+                  <div v-else class='empty-skill'>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -121,11 +129,11 @@
     <div v-if="isMemoModalOpen" id="overlay">
       <div id="modal-content">
         [todo]<br>
-      ・データ編集<br>
-      ・ソート<br>
-      ・カラムはカラム合計でソートされるように<br>
+        ・データ編集<br>
+        ・ソート<br>
+        ・カラムはカラム合計でソートされるように<br>
+        ・全体を横スクロール可能に
         <button @click="onCliclCloseMemo()">cancel</button>
-
       </div>
     </div>
 
@@ -151,7 +159,29 @@ export default {
     users_skills: function () {
       return USER_SKILLS
     },
-    category_score_list: function () {
+    any_skill_open: function () {
+      return this.isSkillOpen.length >= 1
+    }
+  },
+  data () {
+    return {
+      msg: 'Welcome to Your Vue.js App',
+      isSkillOpen: [],
+      isAddModalOpen: false,
+      inputName: undefined,
+      isMemoModalOpen: false,
+      inputData: [],
+      inputSkills: [],
+      inputScore: [],
+      computing: false,
+      category_score_list: []
+    }
+  },
+  mounted: function () {
+    this.calcCategoryScoreList()
+  },
+  methods: {
+    calcCategoryScoreList: function () {
       let scoreList = []
       for (let user of this.user_list) {
         for (let category of this.skill_category_list) {
@@ -171,22 +201,9 @@ export default {
           })
         }
       }
-      return scoreList
-    }
-  },
-  data () {
-    return {
-      msg: 'Welcome to Your Vue.js App',
-      isSkillOpen: [],
-      isAddModalOpen: false,
-      inputName: undefined,
-      isMemoModalOpen: false,
-      inputData: [],
-      inputSkills: [],
-      inputScore: []
-    }
-  },
-  methods: {
+      this.category_score_list = scoreList
+      this.computing = false
+    },
     getInputDataByCategoryId: function (categoryId) {
       return this.inputData.filter(x => x.category_id === categoryId)
     },
@@ -233,14 +250,22 @@ export default {
     getCategoryTotal: function (userId, categoryId) {
       return this.category_score_list.filter(x => x.uid === userId).filter(x => x.category_id === categoryId)[0].score
     },
+    getCategoryData: function (userId, categoryId) {
+      return this.category_score_list.filter(x => x.uid === userId).filter(x => x.category_id === categoryId)[0]
+    },
     getCategoryPercent: function (userId, categoryId) {
       let array = []
       for (let cat of this.category_score_list.filter(x => x.category_id === categoryId)) {
         array.push(cat.score)
       }
       let maxScore = Math.max.apply(null, array)
-      console.log(maxScore)
-      return this.category_score_list.filter(x => x.uid === userId).filter(x => x.category_id === categoryId)[0].score / maxScore * 100
+      let categoryData = this.category_score_list.filter(x => x.uid === userId).filter(x => x.category_id === categoryId)[0]
+      if (!categoryData) {
+        console.log(this.category_score_list)
+        console.log(userId, categoryId)
+        return 100
+      }
+      return categoryData.score / maxScore * 100
     },
     onClickAddData: function () {
       this.isAddModalOpen = true
@@ -252,7 +277,7 @@ export default {
     onClickOpenMemo: function () {
       this.isMemoModalOpen = true
     },
-    onClickCloseMemo: function () {
+    onCliclCloseMemo: function () {
       this.isMemoModalOpen = false
     },
     onClickSkillPlus: function (categoryId) {
@@ -281,19 +306,16 @@ export default {
         userIds.push(user.id)
       }
       let nextUid = Math.max.apply(null, userIds) + 1
-      this.user_list.push({
-        id: nextUid,
-        name: this.inputName
-      })
 
       for (let data of this.inputData) {
-        console.log(data.skill)
+        // console.log(data.skill)
         if (data.skill === '新規追加') {
           let skillIds = []
           for (let skill of this.skill_list) {
             skillIds.push(skill.id)
           }
-          let nextSid = Math.max.apply(null, userIds) + 1
+          let nextSid = Math.max.apply(null, skillIds) + 1
+          console.log(nextSid)
           this.skill_list.push({
             id: nextSid,
             name: data.skillname,
@@ -313,11 +335,19 @@ export default {
             score: data.score,
             starred: false
           })
-          this.inputName = undefined
-          this.inputData = []
-          this.isAddModalOpen = false
         }
       }
+
+      this.user_list.push({
+        id: nextUid,
+        name: this.inputName
+      })
+
+      this.inputName = undefined
+      this.inputData = []
+      this.isAddModalOpen = false
+      this.computing = true
+      this.calcCategoryScoreList()
     }
   }
 }
@@ -394,6 +424,13 @@ export default {
   border: 2px solid #000000;
   /* background-color:bisque; */
   height:45px;
+  /* display: inline-flex; */
+}
+.user-content {
+  /* margin: 2px;
+  border: 2px solid #000000; */
+  /* background-color:bisque; */
+  height:45px;
   display: inline-flex;
 }
 .name-cell {
@@ -431,13 +468,16 @@ export default {
 }
 .header {
   position: fixed;
-  /* left-margin:0px; */
-  /* left: 2px; */
 }
 .data-area {
   position: fixed;
-  top:60px;
   height:85%;
   overflow: scroll;
+}
+.is-skill-open {
+  top:80px;
+}
+.is-skill-close {
+  top:60px;
 }
 </style>
