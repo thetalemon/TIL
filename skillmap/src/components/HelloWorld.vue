@@ -1,6 +1,6 @@
 <template>
   <div id="skill-map">
-
+    <!-- {{display_user_list}} -->
     <button @click="onClickAddData()">add new data</button>
     <button @click="onClickOpenMemo()">memo</button><br>
     <div class='header'>
@@ -10,20 +10,25 @@
           class="category"
           :class="{'frontend':cat.id === 1, 'backend':cat.id === 2, 'infra':cat.id === 3, 'research':cat.id === 4, 'other':cat.id === 5}"
           v-for="(cat, key) in skill_category_list"
-          @click="addOpenFlg(cat.id)"
           :key="key"
         >
-          {{cat.name}}
+          <div class="flex">
+            <div @click="addOpenFlg(cat.id)">{{cat.name}}</div>
+            <div @click="onClickSort(cat.id)">▼</div>
+          </div>
           <div class="skills">
             <div
               v-for="(skill, key) in getSkillsByCategoryId(cat.id)"
               :key="key"
             >
-              <div
-                class='skill'
-                v-if="getIsOpen(cat.id)"
-              >
-                {{skill.id}}
+              <div class="flex" v-if="getIsOpen(cat.id)">
+                <div
+                  class='skill'
+
+                >
+                  {{skill.name}}
+                </div>
+                <div @click="onClickSortBySkill(skill.id)">▼</div>
               </div>
             </div>
           </div>
@@ -37,7 +42,7 @@
       <div>
         <div
           class="user-row"
-          v-for="(user, key) in user_list"
+          v-for="(user, key) in display_user_list"
           :key="key"
         >
           <div class="user-content">
@@ -84,7 +89,7 @@
         </div>
       </div>
     </div>
-    <div v-if="isAddModalOpen" id="overlay">
+    <div v-if="isAddModalOpen" id="overlay" @click="onClickClosemodal()">
       <div id="modal-content">
         <p>name: <input v-model="inputName" type=text><p>
         <div
@@ -174,13 +179,85 @@ export default {
       inputSkills: [],
       inputScore: [],
       computing: false,
-      category_score_list: []
+      category_score_list: [],
+      display_user_list: [],
+      sorting_category_id: undefined,
+      sorting_skill_id: undefined,
+      isAsc: true
     }
   },
   mounted: function () {
+    this.display_user_list = this.user_list
     this.calcCategoryScoreList()
   },
   methods: {
+    onClickSort: function (categoryId) {
+      console.log('aaaa')
+      console.log(this.isAsc)
+      this.isAsc = !this.isAsc
+      if (this.sorting_category_id !== categoryId) {
+        this.isAsc = true
+      }
+      console.log('onClickSort1')
+      this.sorting_category_id = categoryId
+      console.log(this.sorting_category_id, categoryId)
+      let list = this.category_score_list.filter(x => x.category_id === categoryId)
+      console.log('onClickSort2')
+      let isAsc = this.isAsc
+      list.sort(function (a, b) {
+        if (a.score < b.score) {
+          if (isAsc) return 1
+          if (!isAsc) return -1
+        }
+        if (a.score > b.score) {
+          if (isAsc) return -1
+          if (!isAsc) return 1
+        }
+        return 0
+      })
+      // console.log(list)
+      let sortedUserList = []
+      for (let item of list) {
+        sortedUserList.push(this.user_list.filter(x => x.id === item.uid)[0])
+      }
+      this.display_user_list = sortedUserList
+    },
+    onClickSortBySkill: function (sid) {
+      console.log('aaaa')
+      console.log(this.isAsc)
+      this.isAsc = !this.isAsc
+      if (this.sorting_skill_id !== sid) {
+        this.isAsc = true
+      }
+      console.log('onClickSort1')
+      this.sorting_skill_id = sid
+      console.log(this.sorting_skill_id, sid)
+      let list = this.users_skills.filter(x => x.sid === sid)
+      console.log('onClickSort2')
+      let isAsc = this.isAsc
+      list.sort(function (a, b) {
+        if (a.score < b.score) {
+          if (isAsc) return 1
+          if (!isAsc) return -1
+        }
+        if (a.score > b.score) {
+          if (isAsc) return -1
+          if (!isAsc) return 1
+        }
+        return 0
+      })
+      let sortedUserList = []
+      for (let item of list) {
+        sortedUserList.push(this.user_list.filter(x => x.id === item.uid)[0])
+      }
+
+      for (let item of this.user_list) {
+        if (!sortedUserList.filter(x => x.id === item.id)[0]) {
+          sortedUserList.push(item)
+        }
+      }
+      this.display_user_list = sortedUserList
+    },
     calcCategoryScoreList: function () {
       let scoreList = []
       for (let user of this.user_list) {
@@ -261,8 +338,6 @@ export default {
       let maxScore = Math.max.apply(null, array)
       let categoryData = this.category_score_list.filter(x => x.uid === userId).filter(x => x.category_id === categoryId)[0]
       if (!categoryData) {
-        console.log(this.category_score_list)
-        console.log(userId, categoryId)
         return 100
       }
       return categoryData.score / maxScore * 100
@@ -384,6 +459,9 @@ export default {
   text-align: center;
   border-left: 2px solid #000000;
   min-width: 100px;
+}
+.flex {
+  display: flex;
 }
 .bar-area{
   height:100%;
