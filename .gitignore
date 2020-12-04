@@ -5,3 +5,4 @@ slacklogin.py
 *pycache*
 number.txt
 *.cache
+node_modules
