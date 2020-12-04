@@ -1,7 +1,6 @@
 .DS_Store
 login.py
 slacklogin.py
-*.jpg
 *pycache*
 number.txt
 *.cache
